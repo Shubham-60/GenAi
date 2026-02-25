@@ -1,6 +1,7 @@
 import time
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 THRESHOLD = 0.58
@@ -35,19 +36,24 @@ def inject_styles() -> None:
     st.markdown(
         """
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
             :root {
-                --medical-blue: #2E86C1;
-                --medical-blue-deep: #1F6FA7;
-                --medical-cyan: #4FB3D9;
-                --app-bg: #F8F9FA;
-                --card-bg: #FFFFFF;
-                --text-main: #1F2937;
-                --text-muted: #6B7280;
-                --border-soft: #E5E7EB;
-                --shadow-soft: 0 12px 30px rgba(30, 41, 59, 0.08);
-                --success: #2E7D32;
-                --warning: #F59E0B;
-                --danger: #D32F2F;
+                --bg-1: #f0f4ff;
+                --bg-2: #e8f8f4;
+                --bg-3: #fdf4ff;
+                --glass: rgba(255, 255, 255, 0.65);
+                --glass-strong: rgba(255, 255, 255, 0.8);
+                --text-main: #0f172a;
+                --text-muted: #475569;
+                --soft-border: rgba(255, 255, 255, 0.55);
+                --accent-a: #00c9a7;
+                --accent-b: #7c3aed;
+                --accent-pink: #ec4899;
+                --accent-orange: #f59e0b;
+                --risk-low: #14b8a6;
+                --risk-med: #f59e0b;
+                --risk-high: #f43f5e;
             }
 
             html {
@@ -61,68 +67,105 @@ def inject_styles() -> None:
             }
 
             .stApp {
-                background: linear-gradient(140deg, #edf7fc 0%, #f5fbff 42%, #eef8f2 100%);
+                font-family: 'DM Sans', sans-serif;
                 color: var(--text-main);
-                background-attachment: fixed;
+                background: linear-gradient(140deg, var(--bg-1), var(--bg-2), var(--bg-3));
+                background-size: 220% 220%;
+                animation: meshFlow 24s ease-in-out infinite;
+                min-height: 100vh;
+                position: relative;
+            }
+
+            .stApp::before,
+            .stApp::after {
+                content: "";
+                position: fixed;
+                border-radius: 50%;
+                filter: blur(75px);
+                opacity: 0.52;
+                pointer-events: none;
+                z-index: 0;
+                animation: blobFloat 18s ease-in-out infinite;
+            }
+
+            .stApp::before {
+                width: 310px;
+                height: 310px;
+                background: radial-gradient(circle at 35% 35%, rgba(0, 201, 167, 0.32), rgba(124, 58, 237, 0.1));
+                top: 8%;
+                left: -70px;
+            }
+
+            .stApp::after {
+                width: 350px;
+                height: 350px;
+                background: radial-gradient(circle at 65% 40%, rgba(236, 72, 153, 0.24), rgba(14, 165, 233, 0.12));
+                bottom: -110px;
+                right: -90px;
+                animation-delay: -9s;
             }
 
             .block-container {
                 max-width: 1020px;
-                padding-top: 3.6rem;
-                padding-bottom: 2rem;
+                padding-top: 2.8rem;
+                padding-bottom: 2.2rem;
+                position: relative;
+                z-index: 1;
             }
 
             [data-testid="stHeader"] {
-                background: rgba(248, 249, 250, 0.88);
-                backdrop-filter: blur(8px);
-                border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+                background: rgba(255, 255, 255, 0.35);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.45);
             }
 
             .hero-shell {
-                background: linear-gradient(115deg, rgba(46, 134, 193, 0.09), rgba(79, 179, 217, 0.08));
-                border: 1px solid rgba(46, 134, 193, 0.16);
-                border-radius: 18px;
-                padding: 1rem 1.1rem;
-                margin-bottom: 1rem;
-                box-shadow: 0 10px 26px rgba(46, 134, 193, 0.08);
-                animation: riseIn 420ms ease-out;
+                background: var(--glass);
+                border: 1px solid var(--soft-border);
+                border-radius: 22px;
+                padding: 1.2rem 1.2rem;
+                margin-bottom: 1.1rem;
+                backdrop-filter: blur(16px);
+                box-shadow: 0 18px 35px rgba(15, 23, 42, 0.07);
+                animation: fadeSlideUp 620ms ease both;
             }
 
             .hero-chip {
                 display: inline-block;
-                background: rgba(46, 134, 193, 0.12);
-                color: var(--medical-blue-deep);
-                border: 1px solid rgba(46, 134, 193, 0.24);
+                background: linear-gradient(120deg, rgba(0, 201, 167, 0.16), rgba(124, 58, 237, 0.16));
+                color: #334155;
+                border: 1px solid rgba(255, 255, 255, 0.65);
                 border-radius: 999px;
                 font-size: 0.75rem;
-                font-weight: 650;
-                padding: 0.2rem 0.55rem;
+                font-weight: 700;
+                padding: 0.22rem 0.62rem;
                 margin-bottom: 0.45rem;
             }
 
             .hero-title {
-                font-size: 2.05rem;
-                font-weight: 760;
-                color: var(--text-main);
-                margin-bottom: 0.2rem;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 2.1rem;
+                font-weight: 800;
+                color: #0f172a;
+                margin-bottom: 0.25rem;
                 letter-spacing: -0.01em;
             }
 
             .hero-subtitle {
-                font-size: 0.98rem;
+                font-size: 0.96rem;
                 color: var(--text-muted);
                 margin-bottom: 0.2rem;
             }
 
             [data-testid="stVerticalBlockBorderWrapper"] {
-                position: relative;
-                overflow: hidden;
                 border-radius: 18px;
-                border: 1px solid var(--border-soft);
-                box-shadow: var(--shadow-soft);
-                background: var(--card-bg);
+                border: 1px solid var(--soft-border);
+                box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+                background: var(--glass);
+                backdrop-filter: blur(16px);
                 padding: 1rem 1.1rem;
-                animation: riseIn 360ms ease-out;
+                animation: fadeSlideUp 620ms ease both;
+                overflow: hidden;
             }
 
             [data-testid="stVerticalBlockBorderWrapper"]::before {
@@ -132,36 +175,46 @@ def inject_styles() -> None:
                 left: -110%;
                 width: 120%;
                 height: 100%;
-                background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-                animation: cardSheen 7.5s ease-in-out infinite;
+                background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+                animation: sheen 8s ease-in-out infinite;
                 pointer-events: none;
             }
+
+            [data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(2) { animation-delay: 80ms; }
+            [data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(3) { animation-delay: 140ms; }
+            [data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(4) { animation-delay: 200ms; }
+            [data-testid="stVerticalBlockBorderWrapper"]:nth-of-type(5) { animation-delay: 260ms; }
 
             .section-shell {
                 display: flex;
                 gap: 0.75rem;
                 align-items: flex-start;
-                padding: 0.75rem 0.9rem;
+                padding: 0.78rem 0.9rem;
                 border-radius: 14px;
-                border: 1px solid rgba(46, 134, 193, 0.16);
-                background: linear-gradient(115deg, rgba(46, 134, 193, 0.08), rgba(79, 179, 217, 0.06));
-                box-shadow: 0 12px 24px rgba(31, 111, 167, 0.08);
-                margin-bottom: 0.6rem;
-                animation: floatIn 360ms ease-out;
+                border: 1px solid rgba(255, 255, 255, 0.6);
+                background: rgba(255, 255, 255, 0.55);
+                margin-bottom: 0.65rem;
+                animation: fadeSlideUp 520ms ease both;
             }
 
             .section-accent {
                 width: 6px;
                 min-height: 44px;
                 border-radius: 999px;
-                background: linear-gradient(180deg, var(--medical-blue-deep), var(--medical-cyan));
-                box-shadow: 0 6px 14px rgba(46, 134, 193, 0.25);
+                background: linear-gradient(180deg, var(--accent-a), var(--accent-b));
+                box-shadow: 0 10px 16px rgba(0, 201, 167, 0.22);
             }
+
+            .section-accent.teal { background: linear-gradient(180deg, #00c9a7, #2dd4bf); }
+            .section-accent.purple { background: linear-gradient(180deg, #7c3aed, #a855f7); }
+            .section-accent.pink { background: linear-gradient(180deg, #ec4899, #f472b6); }
+            .section-accent.orange { background: linear-gradient(180deg, #f59e0b, #fb923c); }
 
             .section-title {
                 font-size: 1.1rem;
-                font-weight: 650;
-                color: var(--text-main);
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-weight: 700;
+                color: #1e293b;
                 margin-bottom: 0.4rem;
             }
 
@@ -173,7 +226,7 @@ def inject_styles() -> None:
 
             hr.section-divider {
                 border: none;
-                border-top: 1px solid var(--border-soft);
+                border-top: 1px solid rgba(148, 163, 184, 0.22);
                 margin: 0.2rem 0 1rem 0;
             }
 
@@ -184,14 +237,6 @@ def inject_styles() -> None:
                 margin-bottom: 0.7rem;
             }
 
-            .risk-percentage {
-                font-size: 3rem;
-                font-weight: 750;
-                line-height: 1;
-                color: var(--text-main);
-                margin-bottom: 0.6rem;
-            }
-
             .score-grid {
                 display: flex;
                 gap: 1.5rem;
@@ -200,59 +245,41 @@ def inject_styles() -> None:
                 padding: 0.35rem 0.2rem 0.2rem;
             }
 
-            .score-ring {
-                --score: 0;
-                --ring-color: #2E86C1;
-                width: 176px;
-                height: 176px;
-                border-radius: 50%;
-                flex-shrink: 0;
-                margin: 0.2rem 0.4rem 0.2rem 0.1rem;
-                background: conic-gradient(
-                    from -90deg,
-                    #2E7D32 0 30%,
-                    #F59E0B 30% 60%,
-                    #D32F2F 60% 100%
-                );
+            .donut-wrap {
+                width: 190px;
+                height: 190px;
+                position: relative;
                 display: grid;
                 place-items: center;
-                position: relative;
-                box-shadow: 0 18px 30px rgba(31, 111, 167, 0.18);
-                animation: floatIn 420ms ease-out;
+                flex-shrink: 0;
             }
 
-            .score-ring::before {
-                content: "";
-                position: absolute;
-                width: 130px;
-                height: 130px;
-                border-radius: 50%;
-                background: #FFFFFF;
-                box-shadow: inset 0 0 20px rgba(148, 163, 184, 0.16);
-                z-index: 2;
+            .donut-svg {
+                width: 190px;
+                height: 190px;
+                transform: rotate(-90deg);
             }
 
-            .score-ring::after {
-                content: "";
+            .donut-center {
                 position: absolute;
-                inset: 0;
+                width: 126px;
+                height: 126px;
                 border-radius: 50%;
-                background: conic-gradient(
-                    from -90deg,
-                    transparent 0 calc(var(--score) * 1%),
-                    #E9EEF4 calc(var(--score) * 1%) 100%
-                );
-                z-index: 1;
+                background: rgba(255, 255, 255, 0.92);
+                border: 1px solid rgba(255, 255, 255, 0.72);
+                box-shadow: inset 0 0 16px rgba(148, 163, 184, 0.22);
+                display: grid;
+                place-items: center;
             }
 
             .score-center {
                 position: relative;
                 text-align: center;
-                z-index: 3;
+                z-index: 2;
             }
 
             .score-value {
-                font-size: 2.2rem;
+                font-size: 2.1rem;
                 font-weight: 760;
                 color: var(--text-main);
                 margin-bottom: 0.1rem;
@@ -279,37 +306,64 @@ def inject_styles() -> None:
                 width: 48px;
                 height: 26px;
                 padding: 2px;
-                background: #D1D5DB;
+                background: linear-gradient(120deg, rgba(240, 244, 255, 0.96), rgba(232, 248, 244, 0.96)) !important;
+                background-color: rgba(232, 240, 252, 0.96) !important;
                 border-radius: 999px;
-                box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.45);
-                transition: background 180ms ease, box-shadow 180ms ease;
+                box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.72), inset 0 0 0 1px rgba(148, 163, 184, 0.3), 0 4px 10px rgba(15, 23, 42, 0.06) !important;
+                transition: all 260ms cubic-bezier(0.22, 1, 0.36, 1);
             }
 
             div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] {
-                background: linear-gradient(120deg, var(--medical-blue-deep), var(--medical-cyan));
-                box-shadow: 0 8px 18px rgba(46, 134, 193, 0.32);
+                background: linear-gradient(120deg, var(--accent-a), var(--accent-b)) !important;
+                background-color: var(--accent-b) !important;
+                box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 10px 22px rgba(0, 201, 167, 0.18), 0 10px 22px rgba(124, 58, 237, 0.24) !important;
             }
 
             div[data-testid="stToggle"] div[role="switch"] > div {
                 width: 22px;
                 height: 22px;
                 border-radius: 999px;
-                background: #FFFFFF;
-                box-shadow: 0 6px 14px rgba(30, 41, 59, 0.18);
-                transition: transform 180ms ease;
+                background: rgba(255, 255, 255, 0.98) !important;
+                box-shadow: 0 6px 14px rgba(71, 85, 105, 0.18) !important;
+                transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, background 220ms ease;
             }
 
             div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] > div {
                 transform: translateX(22px);
+                box-shadow: 0 10px 20px rgba(71, 85, 105, 0.28);
             }
 
             .metric-card {
-                border-radius: 12px;
-                border: 1px solid rgba(148, 163, 184, 0.2);
-                background: rgba(255, 255, 255, 0.8);
-                padding: 0.6rem 0.75rem;
-                box-shadow: 0 10px 20px rgba(30, 41, 59, 0.08);
-                animation: floatIn 420ms ease-out;
+                border-radius: 14px;
+                border: 1px solid rgba(255, 255, 255, 0.62);
+                background: rgba(255, 255, 255, 0.7);
+                padding: 0.65rem 0.78rem;
+                box-shadow: 0 12px 22px rgba(15, 23, 42, 0.06);
+                animation: fadeSlideUp 540ms ease both;
+            }
+
+            .metric-card.low {
+                background: linear-gradient(120deg, rgba(20, 184, 166, 0.18), rgba(255, 255, 255, 0.72));
+            }
+
+            .metric-card.medium {
+                background: linear-gradient(120deg, rgba(245, 158, 11, 0.2), rgba(255, 255, 255, 0.72));
+            }
+
+            .metric-card.high {
+                background: linear-gradient(120deg, rgba(244, 63, 94, 0.18), rgba(255, 255, 255, 0.72));
+            }
+
+            .metric-card.verdict-card.low {
+                background: linear-gradient(125deg, rgba(20, 184, 166, 0.34), rgba(45, 212, 191, 0.16) 42%, rgba(255, 255, 255, 0.82));
+                border: 1px solid rgba(20, 184, 166, 0.28);
+                box-shadow: 0 14px 26px rgba(20, 184, 166, 0.16), 0 8px 16px rgba(15, 23, 42, 0.05);
+            }
+
+            .metric-card.verdict-card.high {
+                background: linear-gradient(125deg, rgba(244, 63, 94, 0.34), rgba(251, 113, 133, 0.16) 42%, rgba(255, 255, 255, 0.82));
+                border: 1px solid rgba(244, 63, 94, 0.28);
+                box-shadow: 0 14px 26px rgba(244, 63, 94, 0.16), 0 8px 16px rgba(15, 23, 42, 0.05);
             }
 
             .metric-title {
@@ -326,22 +380,6 @@ def inject_styles() -> None:
                 color: var(--text-main);
             }
 
-            .risk-track {
-                width: 100%;
-                height: 14px;
-                background: #E9EEF4;
-                border-radius: 999px;
-                overflow: hidden;
-                margin: 0.35rem 0 1rem 0;
-            }
-
-            .risk-fill {
-                height: 14px;
-                border-radius: 999px;
-                transition: width 460ms ease-in-out;
-                box-shadow: 0 0 10px rgba(46, 134, 193, 0.25);
-            }
-
             .badge {
                 display: inline-block;
                 padding: 0.25rem 0.65rem;
@@ -352,13 +390,13 @@ def inject_styles() -> None:
             }
 
             .badge-green {
-                color: #14532D;
-                background: #DCFCE7;
+                color: #115e59;
+                background: rgba(20, 184, 166, 0.16);
             }
 
             .badge-red {
-                color: #7F1D1D;
-                background: #FEE2E2;
+                color: #9f1239;
+                background: rgba(244, 63, 94, 0.16);
             }
 
             .assessment {
@@ -377,15 +415,15 @@ def inject_styles() -> None:
                 text-align: center;
                 font-size: 0.82rem;
                 color: var(--text-muted);
-                background: rgba(255, 255, 255, 0.62);
-                border: 1px solid rgba(148, 163, 184, 0.18);
+                background: rgba(255, 255, 255, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.62);
                 border-radius: 12px;
                 padding: 0.55rem 0.7rem;
             }
 
             .loading-chip {
                 margin-top: 0.5rem;
-                color: var(--medical-blue-deep);
+                color: #5b21b6;
                 font-weight: 600;
                 font-size: 0.92rem;
                 animation: pulseFade 1.1s ease-in-out infinite;
@@ -399,9 +437,10 @@ def inject_styles() -> None:
                 gap: 0.75rem;
                 padding: 2rem 1.5rem;
                 border-radius: 16px;
-                border: 1px solid rgba(46, 134, 193, 0.18);
-                background: linear-gradient(120deg, rgba(46, 134, 193, 0.08), rgba(79, 179, 217, 0.06));
-                box-shadow: 0 12px 24px rgba(31, 111, 167, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.62);
+                background: rgba(255, 255, 255, 0.62);
+                backdrop-filter: blur(12px);
+                box-shadow: 0 14px 28px rgba(15, 23, 42, 0.07);
             }
 
             .loader-orbit {
@@ -410,9 +449,9 @@ def inject_styles() -> None:
                 border-radius: 50%;
                 background: conic-gradient(
                     from 0deg,
-                    rgba(46, 134, 193, 0.1),
-                    rgba(46, 134, 193, 0.6),
-                    rgba(46, 134, 193, 0.1)
+                    rgba(0, 201, 167, 0.15),
+                    rgba(124, 58, 237, 0.55),
+                    rgba(0, 201, 167, 0.15)
                 );
                 display: grid;
                 place-items: center;
@@ -425,7 +464,7 @@ def inject_styles() -> None:
                 width: 74px;
                 height: 74px;
                 border-radius: 50%;
-                background: #FFFFFF;
+                background: #ffffff;
                 box-shadow: inset 0 0 18px rgba(148, 163, 184, 0.2);
             }
 
@@ -434,8 +473,8 @@ def inject_styles() -> None:
                 width: 12px;
                 height: 12px;
                 border-radius: 50%;
-                background: #2E86C1;
-                box-shadow: 0 6px 14px rgba(46, 134, 193, 0.35);
+                background: #00c9a7;
+                box-shadow: 0 6px 14px rgba(0, 201, 167, 0.35);
                 transform: translate(0, -55px);
             }
 
@@ -444,46 +483,129 @@ def inject_styles() -> None:
                 color: var(--text-muted);
             }
 
+            .summary-compact {
+                margin-top: 0.35rem;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.62);
+            }
+
+            .summary-row {
+                display: grid;
+                grid-template-columns: minmax(180px, 1fr) minmax(120px, 0.8fr);
+                gap: 0.8rem;
+                padding: 0.55rem 0.8rem;
+                align-items: center;
+                font-size: 0.9rem;
+            }
+
+            .summary-row.compact {
+                padding: 0.44rem 0.7rem;
+                font-size: 0.86rem;
+            }
+
+            .summary-row:nth-child(odd) {
+                background: rgba(255, 255, 255, 0.7);
+            }
+
+            .summary-row:nth-child(even) {
+                background: rgba(241, 245, 249, 0.62);
+            }
+
+            .summary-key {
+                color: #334155;
+                font-weight: 600;
+            }
+
+            .summary-value {
+                color: #0f172a;
+                font-weight: 600;
+                text-align: right;
+            }
+
+            [data-testid="stExpander"] {
+                border: 1px solid rgba(255, 255, 255, 0.62) !important;
+                border-radius: 14px !important;
+                background: rgba(255, 255, 255, 0.55) !important;
+                backdrop-filter: blur(10px);
+                margin-bottom: 0.42rem;
+            }
+
+            [data-testid="stExpander"] details summary {
+                color: #0f172a !important;
+                font-weight: 700;
+                padding-top: 0.15rem;
+                padding-bottom: 0.15rem;
+            }
+
             div[data-baseweb="select"] > div,
             .stNumberInput input,
             .stTextInput input {
-                border-radius: 11px !important;
-                border: 1px solid #D6E2ED !important;
-                background: #FBFDFF !important;
+                border-radius: 999px !important;
+                border: 1px solid rgba(255, 255, 255, 0.7) !important;
+                background: rgba(255, 255, 255, 0.82) !important;
                 transition: border-color 150ms ease, box-shadow 150ms ease;
             }
 
             div[data-baseweb="select"] > div:focus-within,
             .stNumberInput input:focus,
             .stTextInput input:focus {
-                border-color: rgba(46, 134, 193, 0.55) !important;
-                box-shadow: 0 0 0 4px rgba(46, 134, 193, 0.15) !important;
+                border-color: rgba(124, 58, 237, 0.45) !important;
+                box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.13) !important;
+            }
+
+            div[data-baseweb="slider"] div[role="slider"] {
+                border: 2px solid #ffffff !important;
+                background: linear-gradient(120deg, #00c9a7, #7c3aed) !important;
+                box-shadow: 0 8px 16px rgba(0, 201, 167, 0.16), 0 8px 16px rgba(124, 58, 237, 0.2);
+                transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+            }
+
+            div[data-baseweb="slider"] div[role="slider"]:hover {
+                transform: scale(1.04);
+                box-shadow: 0 12px 24px rgba(0, 201, 167, 0.2), 0 12px 24px rgba(124, 58, 237, 0.28);
+            }
+
+            div[data-baseweb="slider"] > div > div:first-child {
+                background: linear-gradient(120deg, rgba(0, 201, 167, 0.36), rgba(124, 58, 237, 0.34)) !important;
+                border-radius: 999px;
+                box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1);
+                transition: width 240ms ease, background 220ms ease, box-shadow 220ms ease;
             }
 
             div.stButton > button[kind="primary"] {
-                background: linear-gradient(118deg, var(--medical-blue-deep), var(--medical-blue), var(--medical-cyan));
+                background: linear-gradient(118deg, var(--accent-a), var(--accent-b));
                 background-size: 200% 200%;
                 color: white;
                 border: none;
-                border-radius: 12px;
-                padding: 0.68rem 1rem;
-                font-weight: 650;
+                border-radius: 999px;
+                padding: 0.72rem 1rem;
+                font-weight: 700;
                 transition: transform 120ms ease-in-out, box-shadow 170ms ease-in-out;
-                box-shadow: 0 10px 22px rgba(46, 134, 193, 0.26);
+                box-shadow: 0 12px 24px rgba(124, 58, 237, 0.24);
                 animation: gradientShift 5.5s ease infinite;
             }
 
             div.stButton > button[kind="primary"]:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 13px 24px rgba(46, 134, 193, 0.31);
+                box-shadow: 0 16px 30px rgba(124, 58, 237, 0.33);
             }
 
             div.stButton > button[kind="secondary"] {
-                border-radius: 12px;
-                border: 1px solid #CAD8E6;
-                color: #1F2937;
-                background: #FDFEFF;
+                border-radius: 999px;
+                border: 1px solid rgba(255, 255, 255, 0.7);
+                color: #334155;
+                background: rgba(255, 255, 255, 0.85);
                 font-weight: 600;
+            }
+
+            label, .stNumberInput label, .stSelectbox label, .stSlider label, .stToggle label {
+                color: #0f172a !important;
+                font-weight: 600 !important;
+            }
+
+            .stMarkdown p, .stMarkdown li, .stMarkdown div {
+                color: #475569;
             }
 
             @keyframes gradientShift {
@@ -492,15 +614,26 @@ def inject_styles() -> None:
                 100% { background-position: 0% 50%; }
             }
 
+            @keyframes meshFlow {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            @keyframes blobFloat {
+                0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+                50% { transform: translateY(-18px) translateX(10px) scale(1.04); }
+            }
+
             @keyframes pulseFade {
                 0%, 100% { opacity: 1; }
                 50% { opacity: 0.55; }
             }
 
-            @keyframes riseIn {
+            @keyframes fadeSlideUp {
                 from {
                     opacity: 0;
-                    transform: translateY(8px);
+                    transform: translateY(16px);
                 }
                 to {
                     opacity: 1;
@@ -508,18 +641,7 @@ def inject_styles() -> None:
                 }
             }
 
-            @keyframes floatIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px) scale(0.98);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-
-            @keyframes cardSheen {
+            @keyframes sheen {
                 0%, 70%, 100% { left: -110%; }
                 84% { left: 120%; }
             }
@@ -535,6 +657,47 @@ def inject_styles() -> None:
                     transition: none !important;
                 }
             }
+
+            @media (max-width: 768px) {
+                .block-container {
+                    padding-top: 1.4rem;
+                    padding-left: 0.85rem;
+                    padding-right: 0.85rem;
+                }
+
+                .hero-title {
+                    font-size: 1.56rem;
+                }
+
+                .score-grid {
+                    justify-content: center;
+                    gap: 1rem;
+                }
+
+                .donut-wrap,
+                .donut-svg {
+                    width: 168px;
+                    height: 168px;
+                }
+
+                .donut-center {
+                    width: 110px;
+                    height: 110px;
+                }
+
+                .summary-row {
+                    grid-template-columns: 1fr;
+                    gap: 0.28rem;
+                }
+
+                .summary-value {
+                    text-align: left;
+                }
+
+                .stApp::after {
+                    display: none;
+                }
+            }
         </style>
         """,
         unsafe_allow_html=True,
@@ -545,11 +708,74 @@ def render_helper(text: str) -> None:
     st.markdown(f"<div class='helper-text'>{text}</div>", unsafe_allow_html=True)
 
 
-def section_header(title: str, caption: str) -> None:
+def scroll_to_top() -> None:
+    components.html(
+        """
+        <script>
+            const selectors = [
+                "section.main",
+                "[data-testid='stAppViewContainer']",
+                "[data-testid='stMain']",
+                ".main",
+                ".stApp",
+                "main",
+            ];
+
+            const scrollDoc = (doc) => {
+                if (!doc) return;
+                try {
+                    doc.documentElement.scrollTop = 0;
+                    doc.body.scrollTop = 0;
+                } catch (e) {}
+
+                try {
+                    selectors.forEach((selector) => {
+                        const node = doc.querySelector(selector);
+                        if (!node) return;
+                        node.scrollTop = 0;
+                        if (typeof node.scrollTo === "function") {
+                            node.scrollTo({ top: 0, left: 0, behavior: "auto" });
+                        }
+                    });
+                } catch (e) {}
+            };
+
+            const scrollWin = (win) => {
+                if (!win) return;
+                try {
+                    win.scrollTo({ top: 0, left: 0, behavior: "auto" });
+                } catch (e) {}
+                try {
+                    scrollDoc(win.document);
+                } catch (e) {}
+            };
+
+            const forceScrollTop = () => {
+                scrollWin(window);
+                try { scrollWin(window.parent); } catch (e) {}
+                try { scrollWin(window.top); } catch (e) {}
+            };
+
+            forceScrollTop();
+            let attempts = 0;
+            const id = setInterval(() => {
+                forceScrollTop();
+                attempts += 1;
+                if (attempts >= 16) {
+                    clearInterval(id);
+                }
+            }, 70);
+        </script>
+        """,
+        height=0,
+    )
+
+
+def section_header(title: str, caption: str, accent: str = "teal") -> None:
     st.markdown(
         f"""
         <div class='section-shell'>
-            <div class='section-accent'></div>
+            <div class='section-accent {accent}'></div>
             <div>
                 <div class='section-title'>{title}</div>
                 <div class='section-caption'>{caption}</div>
@@ -559,14 +785,6 @@ def section_header(title: str, caption: str) -> None:
         unsafe_allow_html=True,
     )
     st.markdown("<hr class='section-divider' />", unsafe_allow_html=True)
-
-
-def risk_color(probability: float) -> str:
-    if probability < 0.30:
-        return "#2E7D32"
-    if probability <= 0.60:
-        return "#F59E0B"
-    return "#D32F2F"
 
 
 def predict_probability(features: dict) -> float:
@@ -606,7 +824,7 @@ def render_form() -> None:
     defaults = st.session_state.form_values
 
     with st.container(border=True):
-        section_header("Section 1 — Lifestyle", "Daily habits and routine indicators")
+        section_header("Section 1 — Lifestyle", "Daily habits and routine indicators", accent="teal")
         col1, col2 = st.columns(2, gap="large")
         with col1:
             smoker = st.toggle("Smoker", value=defaults.get("smoker", False))
@@ -627,7 +845,7 @@ def render_form() -> None:
     st.write("")
 
     with st.container(border=True):
-        section_header("Section 2 — Medical History", "Known clinical and access-related history")
+        section_header("Section 2 — Medical History", "Known clinical and access-related history", accent="purple")
         col1, col2 = st.columns(2, gap="large")
         with col1:
             high_bp = st.toggle("HighBP", value=defaults.get("high_bp", False))
@@ -647,7 +865,7 @@ def render_form() -> None:
     st.write("")
 
     with st.container(border=True):
-        section_header("Section 3 — Health Condition", "Current health indicators")
+        section_header("Section 3 — Health Condition", "Current health indicators", accent="pink")
         col1, col2 = st.columns(2, gap="large")
         with col1:
             bmi = st.number_input(
@@ -684,7 +902,7 @@ def render_form() -> None:
     st.write("")
 
     with st.container(border=True):
-        section_header("Section 4 — Demographics", "Basic demographic information")
+        section_header("Section 4 — Demographics", "Basic demographic information", accent="orange")
         col1, col2 = st.columns(2, gap="large")
         with col1:
             sex = st.selectbox(
@@ -700,6 +918,13 @@ def render_form() -> None:
                 value=int(defaults.get("age", 42)),
             )
             render_helper("Select your age in years.")
+            education = st.slider(
+                "Education",
+                min_value=1,
+                max_value=6,
+                value=int(defaults.get("education", 4)),
+            )
+            render_helper("Education level category: 1 (lowest) to 6 (highest).")
         with col2:
             default_income_label = defaults.get("income_label", list(INCOME_OPTIONS.keys())[4])
             income_label = st.selectbox(
@@ -711,6 +936,7 @@ def render_form() -> None:
 
     st.write("")
     if st.button("Predict My Risk", type="primary", use_container_width=True):
+        scroll_to_top()
         st.session_state.form_values = {
             "smoker": smoker,
             "phys_activity": phys_activity,
@@ -729,6 +955,7 @@ def render_form() -> None:
             "phys_hlth": phys_hlth,
             "sex": sex,
             "age": age,
+            "education": education,
             "income_label": income_label,
         }
 
@@ -750,6 +977,7 @@ def render_form() -> None:
             "PhysHlth": int(phys_hlth),
             "Sex": 1 if sex == "Male" else 0,
             "Age": int(age),
+            "Education": int(education),
             "Income": INCOME_OPTIONS[income_label],
         }
 
@@ -758,12 +986,13 @@ def render_form() -> None:
         st.rerun()
 
     st.markdown(
-        "<div class='disclaimer'>This tool is for educational purposes only and not a medical diagnosis.</div>",
+        "<div class='disclaimer'>Disclaimer: This is an ML model output only, not a medical diagnosis, and it provides no medical recommendations.</div>",
         unsafe_allow_html=True,
     )
 
 
 def render_loading() -> None:
+    scroll_to_top()
     st.markdown(
         """
         <div class='hero-shell'>
@@ -804,22 +1033,70 @@ def render_result() -> None:
         st.session_state.page = "form"
         st.rerun()
 
-    percentage = round(probability * 100)
-    color = risk_color(probability)
+    scroll_to_top()
+
+    top_back_col, _ = st.columns([1, 6])
+    with top_back_col:
+        if st.button("← Back", key="top_back_result"):
+            st.session_state.page = "form"
+            st.rerun()
+
     risk_class = int(probability >= THRESHOLD)
-    if probability < 0.30:
-        risk_band = "Low"
-    elif probability <= 0.60:
-        risk_band = "Medium"
+    score_text = f"{int(round(probability * 100))}%"
+    risk_label = "Low Risk" if risk_class == 0 else "High Risk"
+    risk_tone = "low" if risk_class == 0 else "high"
+    if risk_class == 0:
+        score_color = "#0f766e"
+        donut_grad_start = "#14b8a6"
+        donut_grad_end = "#2dd4bf"
+        donut_track = "rgba(20, 184, 166, 0.18)"
     else:
-        risk_band = "High"
+        score_color = "#be123c"
+        donut_grad_start = "#f43f5e"
+        donut_grad_end = "#fb7185"
+        donut_track = "rgba(244, 63, 94, 0.18)"
+
+    features = st.session_state.features
+    near_band = 0.05
+
+    def clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
+        return max(minimum, min(maximum, value))
+
+    def feature_state(score: float) -> tuple[str, str]:
+        if score < THRESHOLD - near_band:
+            return "low", "Low"
+        if score > THRESHOLD + near_band:
+            return "high", "High"
+        return "medium", "Near"
+
+    high_bp_value = int(features.get("HighBP", 0))
+    bmi_value = float(features.get("BMI", 0.0))
+    gen_hlth_value = int(features.get("GenHlth", 1))
+
+    factor_cards = [
+        {
+            "title": "HighBP",
+            "value": "Yes" if high_bp_value == 1 else "No",
+            "score": clamp(float(high_bp_value)),
+        },
+        {
+            "title": "BMI",
+            "value": f"{bmi_value:.1f}",
+            "score": clamp(bmi_value / 60),
+        },
+        {
+            "title": "GenHlth",
+            "value": f"{gen_hlth_value}/5",
+            "score": clamp(gen_hlth_value / 5),
+        },
+    ]
 
     st.markdown(
         """
         <div class='hero-shell'>
             <div class='hero-chip'>Assessment Summary</div>
             <div class='hero-title'>Your Diabetes Risk Assessment</div>
-            <div class='hero-subtitle'>Model output with threshold-based clinical interpretation</div>
+            <div class='hero-subtitle'>Model output with clinically oriented interpretation</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -828,28 +1105,40 @@ def render_result() -> None:
     reveal = st.empty()
     with reveal.container():
         with st.container(border=True):
+            circumference = 2 * 3.1416 * 80
+            progress = max(0.0, min(1.0, probability))
+            dash = round(circumference * progress, 2)
+            gap = round(circumference - dash, 2)
             st.markdown(
                 f"""
                 <div class='score-grid'>
-                    <div class='score-ring' style='--score: {percentage}; --ring-color: {color};'>
-                        <div class='score-center'>
-                            <div class='score-value'>{percentage}%</div>
-                            <div class='score-label'>Risk Score</div>
+                    <div class='donut-wrap'>
+                        <svg class='donut-svg' viewBox='0 0 190 190' aria-label='Risk donut chart'>
+                            <defs>
+                                <linearGradient id='donutGrad' x1='0%' y1='0%' x2='100%' y2='100%'>
+                                    <stop offset='0%' stop-color='{donut_grad_start}'></stop>
+                                    <stop offset='100%' stop-color='{donut_grad_end}'></stop>
+                                </linearGradient>
+                            </defs>
+                            <circle cx='95' cy='95' r='80' fill='none' stroke='{donut_track}' stroke-width='16'></circle>
+                            <circle cx='95' cy='95' r='80' fill='none' stroke='url(#donutGrad)' stroke-width='16' stroke-linecap='round' stroke-dasharray='{dash} {gap}'></circle>
+                        </svg>
+                        <div class='donut-center'>
+                            <div class='score-center'>
+                                <div class='score-value' style='color:{score_color};'>{score_text}</div>
+                                <div class='score-label'>Risk Score</div>
+                            </div>
                         </div>
                     </div>
                     <div class='score-metrics'>
                         <div class='metric-row'>
-                            <div class='metric-card'>
-                                <div class='metric-title'>Probability</div>
-                                <div class='metric-value'>{probability:.2f}</div>
+                            <div class='metric-card verdict-card {risk_tone}'>
+                                <div class='metric-title'>Verdict</div>
+                                <div class='metric-value'>{risk_label}</div>
                             </div>
-                            <div class='metric-card'>
-                                <div class='metric-title'>Risk Band</div>
-                                <div class='metric-value'>{risk_band}</div>
-                            </div>
-                            <div class='metric-card'>
-                                <div class='metric-title'>Status</div>
-                                <div class='metric-value'>{'Low Risk' if risk_class == 0 else 'High Risk'}</div>
+                            <div class='metric-card {risk_tone}'>
+                                <div class='metric-title'>Risk Tone</div>
+                                <div class='metric-value'>{risk_tone.title()}</div>
                             </div>
                         </div>
                     </div>
@@ -861,36 +1150,84 @@ def render_result() -> None:
     time.sleep(0.12)
 
     with st.container(border=True):
-        if risk_class == 0:
-            st.markdown("<span class='badge badge-green'>Low Risk</span>", unsafe_allow_html=True)
-            st.markdown("<div class='assessment'>✅ Low Risk – Not Diabetic</div>", unsafe_allow_html=True)
-            st.markdown(
-                "<div class='result-note'>Prediction is below the 58% classification threshold.</div>",
-                unsafe_allow_html=True,
+        badge_class = "badge-green" if risk_class == 0 else "badge-red"
+        result_text = "This classification is based on your submitted health profile features."
+        st.markdown(f"<span class='badge {badge_class}'>{risk_label}</span>", unsafe_allow_html=True)
+        st.markdown("<div class='assessment'>Risk Classification</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='result-note'>{result_text}</div>", unsafe_allow_html=True)
+
+        cards_html = ""
+        for card in factor_cards:
+            tone_class, tone_label = feature_state(card["score"])
+            cards_html += (
+                f"<div class='metric-card {tone_class}'>"
+                f"<div class='metric-title'>{card['title']}</div>"
+                f"<div class='metric-value'>{card['value']} • {tone_label}</div>"
+                f"</div>"
             )
-        else:
-            st.markdown("<span class='badge badge-red'>High Risk</span>", unsafe_allow_html=True)
-            st.markdown("<div class='assessment'>⚠ High Risk – Diabetic</div>", unsafe_allow_html=True)
-            st.markdown(
-                "<div class='result-note'>Prediction is at or above the 58% classification threshold.</div>",
-                unsafe_allow_html=True,
-            )
+
+        st.markdown(
+            f"""
+            <div class='result-note' style='margin-top:0.75rem;'>Key Correlated Factors</div>
+            <div class='metric-row' style='margin-top:0.35rem;'>{cards_html}</div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.write("")
 
     with st.container(border=True):
-        section_header("Risk Interpretation", "Clinical-style summary")
-        if risk_class == 0:
-            st.markdown(
-                "Your estimated diabetes risk is currently in a lower range. Continue maintaining healthy eating, regular physical activity, and routine check-ups to keep your risk controlled."
-            )
-        else:
-            st.markdown(
-                "Your estimated risk is in a higher range. Consider discussing this result with a healthcare professional for further evaluation and early preventive care planning."
-            )
-        st.markdown(
-            "Independent of this estimate, consistent sleep, balanced nutrition, physical activity, and regular medical follow-up are recommended for long-term metabolic health."
-        )
+        section_header("Input Summary", "Feature values used for this prediction", accent="teal")
+        yes_no_keys = {
+            "Smoker",
+            "PhysActivity",
+            "Fruits",
+            "Veggies",
+            "HvyAlcoholConsump",
+            "HighBP",
+            "HighChol",
+            "CholCheck",
+            "AnyHealthcare",
+            "NoDocbcCost",
+            "DiffWalk",
+        }
+
+        def display_value(key: str, value: object) -> object:
+            if key == "Sex":
+                if value in (1, "1"):
+                    return "Male"
+                if value in (0, "0"):
+                    return "Female"
+                return value
+
+            if key in yes_no_keys:
+                if value in (1, "1"):
+                    return "Yes"
+                if value in (0, "0"):
+                    return "No"
+
+            return value
+
+        grouped_features = {
+            "Lifestyle": ["Smoker", "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump"],
+            "Medical History": ["HighBP", "HighChol", "CholCheck", "AnyHealthcare", "NoDocbcCost", "DiffWalk"],
+            "Health Condition": ["BMI", "GenHlth", "MentHlth", "PhysHlth"],
+            "Demographics": ["Sex", "Age", "Education", "Income"],
+        }
+
+        for index, (group_name, keys) in enumerate(grouped_features.items()):
+            rows = ""
+            for key in keys:
+                value = st.session_state.features.get(key, "-")
+                pretty_value = display_value(key, value)
+                rows += (
+                    f"<div class='summary-row compact'>"
+                    f"<div class='summary-key'>{key}</div>"
+                    f"<div class='summary-value'>{pretty_value}</div>"
+                    f"</div>"
+                )
+            with st.expander(group_name, expanded=(index == 0)):
+                st.markdown(f"<div class='summary-compact'>{rows}</div>", unsafe_allow_html=True)
 
     st.write("")
     if st.button("Check Again", use_container_width=True):
@@ -898,7 +1235,7 @@ def render_result() -> None:
         st.rerun()
 
     st.markdown(
-        "<div class='disclaimer'>This tool is for educational purposes only and not a medical diagnosis.</div>",
+        "<div class='disclaimer'>Disclaimer: This is an ML model output only, not a medical diagnosis, and it provides no medical recommendations.</div>",
         unsafe_allow_html=True,
     )
 
