@@ -306,11 +306,19 @@ def inject_styles() -> None:
                 width: 48px;
                 height: 26px;
                 padding: 2px;
-                background: linear-gradient(120deg, rgba(240, 244, 255, 0.96), rgba(232, 248, 244, 0.96)) !important;
-                background-color: rgba(232, 240, 252, 0.96) !important;
+                background: linear-gradient(120deg, rgba(148, 163, 184, 0.98), rgba(100, 116, 139, 0.98)) !important;
+                background-color: rgba(100, 116, 139, 0.98) !important;
+                border: 1px solid rgba(30, 41, 59, 0.62) !important;
                 border-radius: 999px;
-                box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.72), inset 0 0 0 1px rgba(148, 163, 184, 0.3), 0 4px 10px rgba(15, 23, 42, 0.06) !important;
+                box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(51, 65, 85, 0.36), 0 4px 10px rgba(15, 23, 42, 0.16) !important;
                 transition: all 260ms cubic-bezier(0.22, 1, 0.36, 1);
+            }
+
+            div[data-testid="stToggle"] div[role="switch"][aria-checked="false"] {
+                background: linear-gradient(120deg, rgba(148, 163, 184, 0.98), rgba(100, 116, 139, 0.98)) !important;
+                background-color: rgba(100, 116, 139, 0.98) !important;
+                border: 1px solid rgba(30, 41, 59, 0.62) !important;
+                opacity: 1 !important;
             }
 
             div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] {
@@ -323,9 +331,16 @@ def inject_styles() -> None:
                 width: 22px;
                 height: 22px;
                 border-radius: 999px;
-                background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 6px 14px rgba(71, 85, 105, 0.18) !important;
+                background: rgba(255, 255, 255, 1) !important;
+                border: 2px solid rgba(30, 41, 59, 0.7) !important;
+                box-shadow: 0 5px 12px rgba(15, 23, 42, 0.24) !important;
                 transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, background 220ms ease;
+            }
+
+            div[data-testid="stToggle"] div[role="switch"][aria-checked="false"] > div {
+                background: rgba(255, 255, 255, 1) !important;
+                border: 2px solid rgba(30, 41, 59, 0.7) !important;
+                opacity: 1 !important;
             }
 
             div[data-testid="stToggle"] div[role="switch"][aria-checked="true"] > div {
@@ -547,6 +562,53 @@ def inject_styles() -> None:
                 transition: border-color 150ms ease, box-shadow 150ms ease;
             }
 
+            .stNumberInput input,
+            .stNumberInput input::placeholder,
+            .stTextInput input,
+            .stTextInput input::placeholder {
+                color: #0f172a !important;
+                -webkit-text-fill-color: #0f172a !important;
+                opacity: 1 !important;
+            }
+
+            div[data-baseweb="select"] > div,
+            div[data-baseweb="select"] > div * {
+                color: #0f172a !important;
+                -webkit-text-fill-color: #0f172a !important;
+                opacity: 1 !important;
+            }
+
+            div[data-baseweb="select"] input,
+            div[data-baseweb="select"] input::placeholder,
+            div[data-baseweb="select"] [data-testid="stMarkdownContainer"],
+            div[data-baseweb="select"] [data-testid="stMarkdownContainer"] * {
+                color: #0f172a !important;
+                -webkit-text-fill-color: #0f172a !important;
+                opacity: 1 !important;
+            }
+
+            div[data-baseweb="select"] svg {
+                color: #0f172a !important;
+                fill: #0f172a !important;
+                stroke: #0f172a !important;
+                opacity: 1 !important;
+            }
+
+            div[role="listbox"] {
+                background: rgba(255, 255, 255, 0.96) !important;
+                border: 1px solid rgba(203, 213, 225, 0.9) !important;
+            }
+
+            div[role="option"] {
+                color: #0f172a !important;
+                -webkit-text-fill-color: #0f172a !important;
+                opacity: 1 !important;
+            }
+
+            div[role="option"][aria-selected="true"] {
+                background: rgba(124, 58, 237, 0.14) !important;
+            }
+
             div[data-baseweb="select"] > div:focus-within,
             .stNumberInput input:focus,
             .stTextInput input:focus {
@@ -602,6 +664,23 @@ def inject_styles() -> None:
             label, .stNumberInput label, .stSelectbox label, .stSlider label, .stToggle label {
                 color: #0f172a !important;
                 font-weight: 600 !important;
+            }
+
+            div[data-testid="stToggle"] [data-testid="stWidgetLabel"],
+            div[data-testid="stToggle"] [data-testid="stWidgetLabel"] *,
+            div[data-testid="stToggle"] [data-testid="stMarkdownContainer"],
+            div[data-testid="stToggle"] [data-testid="stMarkdownContainer"] *,
+            div[data-testid="stCheckbox"] [data-testid="stWidgetLabel"],
+            div[data-testid="stCheckbox"] [data-testid="stWidgetLabel"] *,
+            div[data-testid="stCheckbox"] [data-testid="stMarkdownContainer"],
+            div[data-testid="stCheckbox"] [data-testid="stMarkdownContainer"] *,
+            div[role="switch"] + div,
+            div[role="switch"] + div *,
+            div[role="switch"] ~ div,
+            div[role="switch"] ~ div * {
+                color: #000000 !important;
+                -webkit-text-fill-color: #000000 !important;
+                opacity: 1 !important;
             }
 
             .stMarkdown p, .stMarkdown li, .stMarkdown div {
@@ -702,7 +781,6 @@ def inject_styles() -> None:
         """,
         unsafe_allow_html=True,
     )
-
 
 def render_helper(text: str) -> None:
     st.markdown(f"<div class='helper-text'>{text}</div>", unsafe_allow_html=True)
@@ -926,11 +1004,14 @@ def render_form() -> None:
             )
             render_helper("Education level category: 1 (lowest) to 6 (highest).")
         with col2:
-            default_income_label = defaults.get("income_label", list(INCOME_OPTIONS.keys())[4])
+            income_options = list(INCOME_OPTIONS.keys())
+            default_income_label = defaults.get("income_label", income_options[4])
+            if default_income_label not in income_options:
+                default_income_label = income_options[4]
             income_label = st.selectbox(
                 "Income",
-                options=list(INCOME_OPTIONS.keys()),
-                index=list(INCOME_OPTIONS.keys()).index(default_income_label),
+                options=income_options,
+                index=income_options.index(default_income_label),
             )
             render_helper("Household income category used in the model.")
 
