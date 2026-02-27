@@ -1,10 +1,37 @@
 import time
+from pathlib import Path
 
+import joblib
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
 
 THRESHOLD = 0.58
+FEATURE_ORDER = [
+    "HighBP",
+    "HighChol",
+    "CholCheck",
+    "BMI",
+    "Smoker",
+    "PhysActivity",
+    "Fruits",
+    "Veggies",
+    "HvyAlcoholConsump",
+    "AnyHealthcare",
+    "NoDocbcCost",
+    "GenHlth",
+    "MentHlth",
+    "PhysHlth",
+    "DiffWalk",
+    "Sex",
+    "Age",
+    "Education",
+    "Income",
+]
+APP_DIR = Path(__file__).resolve().parent
+MODEL_PATH = APP_DIR / "models" / "lr_model.pkl"
+SCALER_PATH = APP_DIR / "models" / "scaler.pkl"
 INCOME_OPTIONS = {
     "1 — Less than $10,000": 1,
     "2 — $10,000 to < $15,000": 2,
@@ -865,26 +892,58 @@ def section_header(title: str, caption: str, accent: str = "teal") -> None:
     st.markdown("<hr class='section-divider' />", unsafe_allow_html=True)
 
 
+def age_to_category(age_years: int) -> int:
+    if age_years <= 24:
+        return 1
+    if age_years <= 29:
+        return 2
+    if age_years <= 34:
+        return 3
+    if age_years <= 39:
+        return 4
+    if age_years <= 44:
+        return 5
+    if age_years <= 49:
+        return 6
+    if age_years <= 54:
+        return 7
+    if age_years <= 59:
+        return 8
+    if age_years <= 64:
+        return 9
+    if age_years <= 69:
+        return 10
+    if age_years <= 74:
+        return 11
+    if age_years <= 79:
+        return 12
+    return 13
+
+
+@st.cache_resource(show_spinner=False)
+def load_model_artifacts():
+    if not MODEL_PATH.exists() or not SCALER_PATH.exists():
+        missing = []
+        if not MODEL_PATH.exists():
+            missing.append(str(MODEL_PATH))
+        if not SCALER_PATH.exists():
+            missing.append(str(SCALER_PATH))
+        raise FileNotFoundError(
+            "Missing model artifacts: " + ", ".join(missing)
+        )
+
+    model = joblib.load(MODEL_PATH)
+    scaler = joblib.load(SCALER_PATH)
+    return model, scaler
+
+
 def predict_probability(features: dict) -> float:
-    risk_score = (
-        0.06 * features["HighBP"]
-        + 0.05 * features["HighChol"]
-        + 0.05 * features["DiffWalk"]
-        + 0.06 * features["Smoker"]
-        + 0.06 * features["HvyAlcoholConsump"]
-        + 0.05 * (features["BMI"] / 60)
-        + 0.05 * (features["Age"] / 100)
-        + 0.05 * (features["GenHlth"] / 5)
-        + 0.03 * (features["MentHlth"] / 30)
-        + 0.03 * (features["PhysHlth"] / 30)
-        + 0.04 * (1 - features["PhysActivity"])
-        + 0.03 * (1 - features["Fruits"])
-        + 0.03 * (1 - features["Veggies"])
-        + 0.03 * (1 - features["AnyHealthcare"])
-        + 0.03 * features["NoDocbcCost"]
-        + 0.02 * (1 - (features["Income"] / 8))
-    )
-    return max(0.01, min(risk_score * 2.0, 0.99))
+    model, scaler = load_model_artifacts()
+    row = {feature: features[feature] for feature in FEATURE_ORDER}
+    frame = pd.DataFrame([row], columns=FEATURE_ORDER)
+    transformed = scaler.transform(frame)
+    probability = float(model.predict_proba(transformed)[0][1])
+    return max(0.0, min(probability, 1.0))
 
 
 def render_form() -> None:
@@ -1057,7 +1116,7 @@ def render_form() -> None:
             "MentHlth": int(ment_hlth),
             "PhysHlth": int(phys_hlth),
             "Sex": 1 if sex == "Male" else 0,
-            "Age": int(age),
+            "Age": age_to_category(int(age)),
             "Education": int(education),
             "Income": INCOME_OPTIONS[income_label],
         }
@@ -1100,7 +1159,20 @@ def render_loading() -> None:
 
     if st.session_state.needs_prediction:
         time.sleep(0.4)
-        probability = predict_probability(st.session_state.features)
+        try:
+            probability = predict_probability(st.session_state.features)
+        except Exception as error:
+            st.session_state.needs_prediction = False
+            st.error(
+                "Model inference failed. Ensure `Final/models/lr_model.pkl` and "
+                "`Final/models/scaler.pkl` exist and match training schema."
+            )
+            st.caption(str(error))
+            if st.button("Back to Form", use_container_width=True):
+                st.session_state.page = "form"
+                st.rerun()
+            return
+
         st.session_state.risk_probability = probability
         st.session_state.risk_class = int(probability >= THRESHOLD)
         st.session_state.needs_prediction = False
@@ -1286,6 +1358,9 @@ def render_result() -> None:
                     return "Yes"
                 if value in (0, "0"):
                     return "No"
+
+            if key == "Age":
+                return st.session_state.form_values.get("age", value)
 
             return value
 
