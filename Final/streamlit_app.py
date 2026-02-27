@@ -42,6 +42,15 @@ INCOME_OPTIONS = {
     "7 — $50,000 to < $75,000": 7,
     "8 — $75,000 or more": 8,
 }
+EDUCATION_OPTIONS = {
+    "1 — Never attended school or only kindergarten": 1,
+    "2 — Grades 1 through 8 (Elementary)": 2,
+    "3 — Grades 9 through 11 (Some high school)": 3,
+    "4 — Grade 12 or GED (High school graduate)": 4,
+    "5 — College 1 year to 3 years (Some college or technical school)": 5,
+    "6 — College 4 years or more (College graduate)": 6,
+}
+EDUCATION_LABELS_BY_CODE = {value: label for label, value in EDUCATION_OPTIONS.items()}
 
 
 def init_session_state() -> None:
@@ -81,6 +90,13 @@ def inject_styles() -> None:
                 --risk-low: #14b8a6;
                 --risk-med: #f59e0b;
                 --risk-high: #f43f5e;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"] {
+                color-scheme: light !important;
             }
 
             html {
@@ -1055,13 +1071,21 @@ def render_form() -> None:
                 value=int(defaults.get("age", 42)),
             )
             render_helper("Select your age in years.")
-            education = st.slider(
-                "Education",
-                min_value=1,
-                max_value=6,
-                value=int(defaults.get("education", 4)),
+            education_options = list(EDUCATION_OPTIONS.keys())
+            default_education_code = int(defaults.get("education", 4))
+            default_education_label = defaults.get(
+                "education_label",
+                EDUCATION_LABELS_BY_CODE.get(default_education_code, education_options[3]),
             )
-            render_helper("Education level category: 1 (lowest) to 6 (highest).")
+            if default_education_label not in education_options:
+                default_education_label = EDUCATION_LABELS_BY_CODE.get(default_education_code, education_options[3])
+            education_label = st.selectbox(
+                "Education",
+                options=education_options,
+                index=education_options.index(default_education_label),
+            )
+            education = EDUCATION_OPTIONS[education_label]
+            render_helper("Select your education level category used by the model.")
         with col2:
             income_options = list(INCOME_OPTIONS.keys())
             default_income_label = defaults.get("income_label", income_options[4])
@@ -1096,6 +1120,7 @@ def render_form() -> None:
             "sex": sex,
             "age": age,
             "education": education,
+            "education_label": education_label,
             "income_label": income_label,
         }
 
@@ -1361,6 +1386,18 @@ def render_result() -> None:
 
             if key == "Age":
                 return st.session_state.form_values.get("age", value)
+
+            if key == "Education":
+                saved_label = st.session_state.form_values.get("education_label")
+                if saved_label:
+                    return saved_label
+                if isinstance(value, (int, float, str)):
+                    try:
+                        education_code = int(value)
+                        return EDUCATION_LABELS_BY_CODE.get(education_code, value)
+                    except ValueError:
+                        return value
+                return value
 
             return value
 
