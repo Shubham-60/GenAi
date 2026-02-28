@@ -20,7 +20,7 @@ A machine learning project that predicts diabetes risk from lifestyle and clinic
 
 ## Dataset
 
-- Source: https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset
+- Source: [BRFSS 2015 Diabetes Health Indicators (Kaggle)](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset)
 - Records: ~253,680
 - Features: 21
 - Target: `Diabetes_binary` (0 = No, 1 = Yes)
@@ -49,11 +49,11 @@ If Mermaid does not render in your Markdown viewer, open this README on GitHub.
 
 ## Links
 
-- Live app: https://diabetespreidictor.streamlit.app/
+- Live app: [Diabetes Risk Predictor](https://diabetespreidictor.streamlit.app/)
 - App implementation details: [Final/README.md](Final/README.md)
 
 ## Team
 
-- Shubham Aggarwal
-- Atharva Sharma
-- Bhavya Punj
+- [Shubham Aggarwal](https://github.com/Shubham-60)
+- [Atharva Sharma](https://github.com/alpha-sml)
+- [Bhavya Punj](https://github.com/Rravya14)
