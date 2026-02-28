@@ -1,0 +1,253 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{hyperref}
+
+\title{Diabetes Risk Prediction using Machine Learning}
+\author{
+\begin{tabular}{ccc}
+Shubham Aggarwal & Atharva Sharma & Bhavya Punj \\
+\end{tabular}
+\\[0.5cm]
+\textit{Milestone 1 Project}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% --------------------------------------------------
+
+\section{Introduction}
+
+Early detection of diabetes is critical in preventive healthcare. This project aims to develop a machine learning-based system to predict diabetes risk using health indicators. The objective is to build a reliable classification model that balances predictive performance while minimizing both false positives and false negatives.
+
+% --------------------------------------------------
+
+\section{Dataset Description}
+
+The dataset used is the \textbf{\href{https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset}{Diabetes Health Indicators Dataset}}.
+
+It is derived from the \textbf{BRFSS 2015 survey} conducted by the CDC and contains approximately \textbf{253,680 records} with 21 features and one binary target variable.
+
+\textbf{Target Variable:}
+\begin{itemize}
+\item 0: Non-diabetic
+\item 1: Diabetic or pre-diabetic
+\end{itemize}
+
+% --------------------------------------------------
+
+\section{Feature Encoding}
+
+Several features in the dataset are encoded categorical variables:
+
+\textbf{Age:}
+Categorized into 13 groups:
+\begin{itemize}
+\item 1: 18–24
+\item 2: 25–29
+\item 3: 30–34
+\item 4: 35–39
+\item 5: 40–44
+\item 6: 45–49
+\item 7: 50–54
+\item 8: 55–59
+\item 9: 60–64
+\item 10: 65–69
+\item 11: 70–74
+\item 12: 75–79
+\item 13: 80+
+\end{itemize}
+
+\textbf{Education (Grade Level):}
+\begin{itemize}
+\item 1: No formal education (Kindergarten or below)
+\item 2: Grades 1–8 (Elementary)
+\item 3: Grades 9–11 (Some high school)
+\item 4: Grade 12 / GED (High school graduate)
+\item 5: Grades 13–15 (Undergraduate / College 1–3 years)
+\item 6: Grade 16+ (College graduate or higher)
+\end{itemize}
+
+\textbf{Income:}
+\begin{itemize}
+\item 1: Less than \$10,000
+\item 2: \$10,000 – \$15,000
+\item 3: \$15,000 – \$20,000
+\item 4: \$20,000 – \$25,000
+\item 5: \$25,000 – \$35,000
+\item 6: \$35,000 – \$50,000
+\item 7: \$50,000 – \$75,000
+\item 8: \$75,000 or more
+\end{itemize}
+
+\textbf{General Health (GenHlth):}
+\begin{itemize}
+\item 1: Excellent
+\item 2: Very good
+\item 3: Good
+\item 4: Fair
+\item 5: Poor
+\end{itemize}
+
+These encodings preserve ordinal relationships and improve model learning.
+
+% --------------------------------------------------
+
+\section{Data Preprocessing}
+
+The following preprocessing steps were applied:
+
+\begin{itemize}
+\item Removal of redundant features: Stroke, HeartDiseaseorAttack
+\item Removal of duplicate records
+\item Feature scaling using StandardScaler
+\item Handling class imbalance using SMOTE
+\end{itemize}
+
+% --------------------------------------------------
+
+\section{Model Development}
+
+Four models were implemented:
+
+\begin{itemize}
+\item Logistic Regression (LR)
+\item Random Forest (RF)
+\item XGBoost (XGB)
+\item Artificial Neural Network (ANN)
+\end{itemize}
+
+All models were trained under consistent conditions using SMOTE, hyperparameter tuning, and threshold optimization.
+
+% --------------------------------------------------
+
+\section{Model Evaluation}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Model & Accuracy & Precision & Recall & F1 \\
+\midrule
+Logistic Regression & 0.765 & 0.356 & 0.654 & 0.461 \\
+Random Forest & 0.779 & 0.369 & 0.613 & 0.460 \\
+XGBoost & 0.786 & 0.378 & 0.609 & 0.466 \\
+ANN & 0.782 & 0.374 & 0.622 & 0.467 \\
+\bottomrule
+\end{tabular}
+\caption{Performance Comparison of Models}
+\end{table}
+
+All models show comparable performance. ANN achieved the highest F1-score, while XGBoost achieved the highest AUC.
+
+% --------------------------------------------------
+
+\section{Confusion Matrix Analysis}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{cm_lr.png}
+\caption{Confusion Matrix for Logistic Regression}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{cm_ann.png}
+\caption{Confusion Matrix for ANN}
+\end{figure}
+
+\textbf{Observations:}
+\begin{itemize}
+\item Logistic Regression produces fewer false negatives
+\item ANN achieves slightly better balance but misses more diabetic cases
+\item Logistic Regression is more reliable for healthcare screening
+\end{itemize}
+
+% --------------------------------------------------
+
+\section{Final Model Selection}
+
+Logistic Regression was selected as the final model due to:
+
+\begin{itemize}
+\item Higher Recall (0.654)
+\item Lower False Negatives
+\item Better suitability for healthcare applications
+\end{itemize}
+
+In healthcare, minimizing false negatives is critical as missing a diabetic patient can have serious consequences.
+
+% --------------------------------------------------
+
+\section{Final Model Pipeline}
+
+\begin{itemize}
+\item StandardScaler
+\item SMOTE
+\item Logistic Regression (C = 0.01)
+\item Threshold = 0.58
+\end{itemize}
+
+The model was retrained on the full dataset for deployment.
+
+% --------------------------------------------------
+
+\section{Deployment}
+
+The model is deployed using a Streamlit application:
+
+\begin{center}
+\href{https://diabetespreidictor.streamlit.app/}{\textbf{Live Application Link}}
+\end{center}
+
+The application:
+\begin{itemize}
+\item Collects user health data
+\item Predicts diabetes probability
+\item Displays risk classification
+\end{itemize}
+
+% --------------------------------------------------
+
+\section{Project Resources}
+
+\begin{itemize}
+\item \textbf{Stage 1:} \href{https://colab.research.google.com/drive/1afKjobnAKRFcwjhJcjtyHykuLArL1Ksc}{Notebook}
+\item \textbf{Stage 2:} \href{https://colab.research.google.com/drive/1ihrrm2ARWfcX3qEfP6SPwClrs9_sfYhn}{Notebook}
+\item \textbf{Final Model:} \href{https://colab.research.google.com/drive/1pCnNA_h9pjJY3jj51gcATk05sWy1TPg1}{Notebook}
+\end{itemize}
+
+% --------------------------------------------------
+
+\section{Conclusion}
+
+This project demonstrates a complete machine learning workflow for diabetes prediction. Logistic Regression was selected due to its strong recall and lower false negative rate, making it more suitable for healthcare applications.
+
+% --------------------------------------------------
+
+\section{Future Work}
+
+\begin{itemize}
+\item Integration with AI assistants
+\item Model explainability (SHAP/LIME)
+\item Real-time monitoring systems
+\end{itemize}
+
+% --------------------------------------------------
+
+\begin{thebibliography}{9}
+
+\bibitem{kaggle_dataset}
+A. Teboul,
+\textit{Diabetes Health Indicators Dataset}, Kaggle. 
+\href{https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset}{Link}
+
+\end{thebibliography}
+
+\end{document}
